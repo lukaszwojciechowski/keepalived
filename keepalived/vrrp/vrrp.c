@@ -5116,6 +5116,14 @@ vrrp_complete_init(void)
 
 	alloc_vrrp_buffer(max_mtu_len ? max_mtu_len : DEFAULT_MTU);
 
+	/* Bring vrrp instances up if there are no vrrp_scripts monitored */
+	list_for_each_entry(vrrp, &vrrp_data->vrrp, e_list) {
+		if (!vrrp->num_script_init &&
+		    (!vrrp->sync || !vrrp->sync->num_member_init)) {
+			try_up_instance(vrrp, true, VRRP_FAULT_FL_TRACKER);
+		}
+	}
+
 	return true;
 }
 
